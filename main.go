@@ -8,7 +8,7 @@ import (
 
 // Detects open-source licenses by matching distinctive phrase patterns.
 var LICENSES = []struct {
-	name  string
+	name    string
 	pattern string
 }{
 	{"MIT", "Permission is hereby granted, free of charge"},
@@ -23,11 +23,18 @@ var LICENSES = []struct {
 	{"0BSD", "Permission to use, copy, modify, and/or distribute this software"},
 }
 
+// collapse makes matching whitespace-insensitive: real license headers
+// wrap ("GNU GENERAL PUBLIC LICENSE" / "Version 3, 29 June 2007"), and a
+// naive Contains on the joined text misses every GPL file in the wild.
+func collapse(text string) string {
+	return strings.Join(strings.Fields(strings.ToUpper(text)), " ")
+}
+
 func detect(text string) []string {
-	upper := strings.ToUpper(text)
+	haystack := collapse(text)
 	var found []string
 	for _, lic := range LICENSES {
-		if strings.Contains(upper, strings.ToUpper(lic.pattern)) {
+		if strings.Contains(haystack, collapse(lic.pattern)) {
 			found = append(found, lic.name)
 		}
 	}
