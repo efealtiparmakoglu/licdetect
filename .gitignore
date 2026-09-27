@@ -1,0 +1,4 @@
+/licdetect
+*.test
+.DS_Store
+target/
